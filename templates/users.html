@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" dir="{% if current_lang == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('users') }} - Vehicle Scheduling System</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .user-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .user-info h3 {
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .user-info p {
+            color: #718096;
+            font-size: 0.9em;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .role-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .role-admin {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .role-user {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        
+        .language-badge {
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            background: #f7fafc;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚗 Vehicle Scheduling System</h1>
+        <div class="user-info">
+            <span>{{ current_user.username }} ({{ current_user.role }})</span>
+            <div class="language-switcher">
+                <a href="/set-language/en" class="lang-btn {% if current_lang == 'en' %}active{% endif %}">EN</a>
+                <a href="/set-language/zh" class="lang-btn {% if current_lang == 'zh' %}active{% endif %}">中文</a>
+                <a href="/set-language/ar" class="lang-btn {% if current_lang == 'ar' %}active{% endif %}">العربية</a>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">{{ t('logout') }}</a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="main-nav">
+            <a href="/" class="nav-link">📊 {{ t('dashboard') }}</a>
+            <a href="/vehicles" class="nav-link">🚗 {{ t('vehicles') }}</a>
+            <a href="/requests" class="nav-link">📝 {{ t('requests') }}</a>
+            <a href="/schedule" class="nav-link">📅 {{ t('schedule') }}</a>
+            <a href="/users" class="nav-link active">👥 {{ t('users') }}</a>
+        </nav>
+        
+        <div class="section">
+            <h2>👥 {{ t('user_management') }}</h2>
+            <div id="users-message" class="message" style="display:none;"></div>
+            <div id="users-list"></div>
+        </div>
+    </div>
+    
+    <script src="/static/script.js"></script>
+    <script>
+        loadUsers();
+        
+        function loadUsers() {
+            fetch('/api/users')
+            .then(res => res.json())
+            .then(users => {
+                const container = document.getElementById('users-list');
+                let html = '';
+                
+                users.forEach(user => {
+                    html += '<div class="user-card">';
+                    html += '<div class="user-info">';
+                    html += `<h3>${user.username}</h3>`;
+                    html += `<p>ID: ${user.id} | `;
+                    html += `<span class="language-badge">${user.language}</span></p>`;
+                    html += '</div>';
+                    
+                    html += '<div class="user-actions">';
+                    html += `<span class="role-badge role-${user.role}">${user.role}</span>`;
+                    
+                    if (user.id != {{ current_user.id }}) {
+                        if (user.role === 'user') {
+                            html += `<button onclick="setAdmin(${user.id}, 'admin')" class="btn btn-warning btn-small">{{ t('set_admin') }}</button>`;
+                        } else {
+                            html += `<button onclick="setAdmin(${user.id}, 'user')" class="btn btn-info btn-small">{{ t('remove_admin') }}</button>`;
+                        }
+                        html += `<button onclick="deleteUser(${user.id})" class="btn btn-danger btn-small">{{ t('delete') }}</button>`;
+                    }
+                    
+                    html += '</div>';
+                    html += '</div>';
+                });
+                
+                container.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Failed to load users:', error);
+            });
+        }
+        
+        function setAdmin(userId, role) {
+            if (!confirm(`{{ t('confirm_set_role') }} ${role}?`)) {
+                return;
+            }
+            
+            fetch(`/api/users/${userId}/role`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({role: role})
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showMessage('users-message', result.message, 'success');
+                    loadUsers();
+                } else {
+                    showMessage('users-message', result.message, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('users-message', 'Error: ' + error.message, 'error');
+            });
+        }
+        
+        function deleteUser(userId) {
+            if (!confirm(`{{ t('confirm_delete_user') }}`)) {
+                return;
+            }
+            
+            fetch(`/api/users/${userId}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showMessage('users-message', result.message, 'success');
+                    loadUsers();
+                } else {
+                    showMessage('users-message', result.message, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('users-message', 'Error: ' + error.message, 'error');
+            });
+        }
+    </script>
+</body>
+</html>

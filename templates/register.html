@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" dir="{% if current_lang == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('register') }} - Vehicle Scheduling System</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* 注册页面特殊样式 */
+        .register-container {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        
+        .register-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 60px 50px;
+            border-radius: 25px;
+            box-shadow: 0 25px 80px rgba(102, 126, 234, 0.3);
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .register-header h2 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .register-header p {
+            color: #718096;
+            font-size: 1.1em;
+        }
+        
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-group label {
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.05em;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .form-group input::placeholder {
+            color: #a0aec0;
+        }
+        
+        .register-button {
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            margin-top: 10px;
+        }
+        
+        .register-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+        
+        .register-button:active {
+            transform: translateY(-2px);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #718096;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .language-selector {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .language-selector a {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: transparent;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+        
+        .language-selector a:hover,
+        .language-selector a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* 消息提示 */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            color: #22543d;
+            border-left: 5px solid #38a169;
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+            color: #742a2a;
+            border-left: 5px solid #e53e3e;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .register-card {
+                padding: 40px 30px;
+            }
+            
+            .register-header h2 {
+                font-size: 2em;
+            }
+            
+            .language-selector {
+                position: relative;
+                top: auto;
+                right: auto;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 语言选择器 -->
+    <div class="language-selector">
+        <a href="/set-language/en" class="{% if current_lang == 'en' %}active{% endif %}">EN</a>
+        <a href="/set-language/zh" class="{% if current_lang == 'zh' %}active{% endif %}">中文</a>
+        <a href="/set-language/ar" class="{% if current_lang == 'ar' %}active{% endif %}">العربية</a>
+    </div>
+    
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <h2>🚗 {{ t('register') }}</h2>
+                <p>Create your account to get started</p>
+            </div>
+            
+            <!-- 消息提示 -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" class="register-form">
+                <div class="form-group">
+                    <label for="username">{{ t('username') }}</label>
+                    <input type="text" id="username" name="username" placeholder="{{ t('username') }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">{{ t('password') }}</label>
+                    <input type="password" id="password" name="password" placeholder="{{ t('password') }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="language">{{ t('select_language') }}</label>
+                    <select id="language" name="language">
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="register-button">{{ t('register') }}</button>
+            </form>
+            
+            <div class="login-link">
+                <p>Already have an account? <a href="{{ url_for('login') }}">{{ t('login') }}</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

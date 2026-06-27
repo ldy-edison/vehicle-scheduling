@@ -1,0 +1,33 @@
+{
+  "$schema": "https://github.com/zeabur/zeabur/raw/main/schema.json",
+  "name": "vehicle-scheduling",
+  "version": "1.0.0",
+  "build": {
+    "builder": "NIXPACKS",
+    "options": {
+      "nixpacksVersion": "1.x"
+    }
+  },
+  "deploy": {
+    "restartPolicy": "ON_FAILURE",
+    "restartPolicyRetries": 10,
+    "environmentVariables": {
+      "FLASK_ENV": "production",
+      "SECRET_KEY": "vehicle-scheduling-secret-key-2026-uae"
+    },
+    "healthCheck": {
+      "path": "/",
+      "interval": 30,
+      "timeout": 10,
+      "restartThreshold": 3
+    }
+  },
+  "network": {
+    "ports": [
+      {
+        "port": 5000,
+        "public": true
+      }
+    ]
+  }
+}

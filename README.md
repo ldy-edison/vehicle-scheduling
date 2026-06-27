@@ -1,152 +1,41 @@
-# 车辆调度管理系统
+# 🚗 Vehicle Scheduling System / 车辆调度系统
 
-一个基于Web的智能车辆调度系统，帮助企业高效管理车辆资源和用车申请。
+A professional vehicle scheduling and fleet management web application with multi-language support (EN/ZH/AR).
 
-## 功能特性
+**Live Demo: [https://vehicle-scheduling.vercel.app](https://vehicle-scheduling.vercel.app)**
 
-✅ **车辆管理**：添加/删除车辆，设置车型和容量
-✅ **用车申请**：提交用车需求，包括路线、人数、时间
-✅ **智能调度**：自动匹配最优车辆分配方案
-✅ **调度结果**：可视化查看每辆车的任务安排
-✅ **数据统计**：实时查看车辆使用率和申请完成情况
+---
 
-## 安装步骤
+## Features / 功能
 
-### 1. 进入项目目录
-```bash
-cd vehicle-scheduling
-```
+- ✅ Multi-language support (English / 中文 / العربية)
+- ✅ User authentication & role management (Admin/User)
+- ✅ Vehicle management
+- ✅ Trip/request management
+- ✅ Intelligent scheduling algorithm
+- ✅ Vehicle return confirmation workflow
+- ✅ Statistics dashboard with charts
+- ✅ UAE localization
 
-### 2. 安装依赖
+---
+
+## Deploy to Vercel / 一键部署到 Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ldy-edison/vehicle-scheduling)
+
+---
+
+## Quick Start / 本地运行
+
 ```bash
 pip install -r requirements.txt
-```
-
-或使用国内镜像加速：
-```bash
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
-### 3. 运行系统
-```bash
 python app.py
+# Open http://localhost:5000
 ```
 
-### 4. 访问系统
-打开浏览器，访问：http://127.0.0.1:5000
+---
 
-## 使用流程
+## Default Login / 默认登录
 
-### 第一步：添加车辆
-1. 点击顶部导航的"车辆管理"
-2. 填写车辆编号、选择车型、输入容量
-3. 点击"添加"按钮
-
-**示例**：
-- 车辆编号：粤A12345
-- 车型：轿车
-- 容量：5人
-
-### 第二步：提交用车申请
-1. 点击"用车申请"
-2. 填写申请人、出发地、目的地、人数、时间
-3. 点击"提交申请"
-
-**示例**：
-- 申请人：张三
-- 路线：公司总部 → 客户公司
-- 人数：3人
-- 时间：2024-01-15 09:00
-
-### 第三步：执行智能调度
-1. 点击"智能调度"
-2. 点击"🚀 开始自动调度"
-3. 查看调度结果
-
-系统会自动：
-- 优先安排容量最合适的车辆（避免大车拉少人）
-- 按乘客数降序分配（先满足人多的需求）
-- 生成详细的调度方案
-
-### 第四步：查看和优化
-- 查看每辆车的任务列表
-- 检查调度统计信息
-- 如需重新调度，点击"重置调度"
-
-## 调度算法说明
-
-当前使用**贪心算法**：
-1. 按乘客数降序排列申请（先安排人多的）
-2. 按容量升序排列车辆（先用小车）
-3. 为每个申请分配第一个容量足够的可用车辆
-
-**未来可升级**：
-- 考虑路线优化（相同目的地的申请合并）
-- 考虑时间窗口（避免时间冲突）
-- 考虑车辆类型匹配（如需要货车的申请不分配轿车）
-
-## 数据库结构
-
-### 车辆表（vehicles）
-- id：车辆编号（主键）
-- type：车型
-- capacity：容量（人数/重量）
-- status：状态（可用/使用中）
-- created_time：创建时间
-
-### 用车申请表（requests）
-- id：申请ID（自增）
-- requester：申请人
-- start_location：出发地
-- end_location：目的地
-- passengers：乘客数
-- request_time：用车时间
-- status：状态（待分配/已分配）
-- notes：备注
-
-### 调度结果表（schedules）
-- id：记录ID
-- vehicle_id：车辆编号
-- request_id：申请ID
-- scheduled_time：调度时间
-- status：状态
-
-## 技术栈
-
-- **后端**：Python 3 + Flask
-- **数据库**：SQLite
-- **前端**：HTML5 + CSS3 + JavaScript
-- **UI设计**：响应式设计，支持移动端
-
-## 常见问题
-
-### Q1：如何修改调度算法？
-编辑 `scheduler.py` 中的 `auto_schedule()` 函数
-
-### Q2：如何备份数据？
-直接复制 `vehicle_scheduling.db` 文件
-
-### Q3：如何查看数据库？
-使用SQLite工具打开 `vehicle_scheduling.db`
-
-### Q4：系统支持多用户吗？
-当前版本为单机版，多用户版本需额外开发
-
-## 未来扩展方向
-
-- [ ] 用户登录和权限管理
-- [ ] 地图集成（显示路线）
-- [ ] 手机APP
-- [ ] 微信小程序
-- [ ] 数据导出（Excel）
-- [ ] 消息通知（邮件/短信）
-- [ ] 车辆维护记录
-- [ ] 费用统计
-
-## 授权协议
-
-MIT License - 可自由使用和修改
-
-## 联系方式
-
-如有问题或建议，欢迎反馈！
+- Username: `admin`
+- Password: `admin123`

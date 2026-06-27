@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" dir="{% if current_lang == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('requests') }} - Vehicle Scheduling System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>🚗 Vehicle Scheduling System</h1>
+        <div class="user-info">
+            <span>{{ current_user.username }} ({{ current_user.role }})</span>
+            <div class="language-switcher">
+                <a href="/set-language/en" class="lang-btn {% if current_lang == 'en' %}active{% endif %}">EN</a>
+                <a href="/set-language/zh" class="lang-btn {% if current_lang == 'zh' %}active{% endif %}">中文</a>
+                <a href="/set-language/ar" class="lang-btn {% if current_lang == 'ar' %}active{% endif %}">العربية</a>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">{{ t('logout') }}</a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="main-nav">
+            <a href="/" class="nav-link">📊 {{ t('dashboard') }}</a>
+            <a href="/vehicles" class="nav-link">🚗 {{ t('vehicles') }}</a>
+            <a href="/requests" class="nav-link active">📝 {{ t('requests') }}</a>
+            <a href="/schedule" class="nav-link">📅 {{ t('schedule') }}</a>
+            {% if current_user.role == 'admin' %}
+            <a href="/users" class="nav-link">👥 Users</a>
+            {% endif %}
+        </nav>
+        
+        <div class="section">
+            <h2>{{ t('submit_request') }}</h2>
+            <form id="request-form" class="form-inline">
+                <input type="text" id="requester-name" placeholder="{{ t('requester_name') }}" required>
+                <input type="text" id="start-location" placeholder="{{ t('start_location') }}" required>
+                <input type="text" id="end-location" placeholder="{{ t('end_location') }}" required>
+                <input type="number" id="passengers" placeholder="{{ t('passengers') }}" min="1" required>
+                <input type="datetime-local" id="request-time" required>
+                <button type="submit" class="btn btn-primary">{{ t('submit') }}</button>
+            </form>
+            <div id="request-message" class="message" style="display:none;"></div>
+        </div>
+
+        <div class="section">
+            <h2>{{ t('request_list') }}</h2>
+            <div id="requests-list" class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{{ t('requester_name') }}</th>
+                            <th>{{ t('start_location') }}</th>
+                            <th>{{ t('end_location') }}</th>
+                            <th>{{ t('passengers') }}</th>
+                            <th>{{ t('request_time') }}</th>
+                            <th>{{ t('status') }}</th>
+                            <th>{{ t('actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-tbody">
+                        <tr>
+                            <td colspan="7" class="empty-text">{{ t('no_data') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+    <script>
+        loadRequests();
+        
+        // 自动刷新（每15秒）
+        setInterval(() => {
+            loadRequests();
+        }, 15000);
+    </script>
+</body>
+</html>

@@ -34,7 +34,7 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('SELECT id, username, role, language FROM users WHERE id = ?', (user_id,))
     row = cursor.fetchone()
@@ -311,7 +311,7 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        conn = sqlite3.connect('vehicle_scheduling.db')
+        conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
         cursor = conn.cursor()
         cursor.execute('SELECT id, username, role, language FROM users WHERE username = ? AND password = ?', 
                      (username, password))
@@ -342,7 +342,7 @@ def register():
         password = request.form.get('password')
         language = request.form.get('language', 'en')
         
-        conn = sqlite3.connect('vehicle_scheduling.db')
+        conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
         cursor = conn.cursor()
         
         try:
@@ -364,7 +364,7 @@ def set_language(lang):
     if lang in LANGUAGES:
         session['language'] = lang
         if current_user.is_authenticated:
-            conn = sqlite3.connect('vehicle_scheduling.db')
+            conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
             cursor = conn.cursor()
             cursor.execute('UPDATE users SET language = ? WHERE id = ?', (lang, current_user.id))
             conn.commit()
@@ -402,7 +402,7 @@ def users_page():
 @login_required
 def get_stats():
     """Get statistics"""
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     
     try:
@@ -444,7 +444,7 @@ def get_stats():
 @login_required
 def get_detailed_stats():
     """Get detailed statistics (for charts)"""
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     
     try:
@@ -498,7 +498,7 @@ def get_detailed_stats():
 def vehicles_api():
     if request.method == 'POST':
         data = request.get_json()
-        conn = sqlite3.connect('vehicle_scheduling.db')
+        conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
         cursor = conn.cursor()
         try:
             cursor.execute('INSERT INTO vehicles (id, type, capacity) VALUES (?, ?, ?)',
@@ -511,7 +511,7 @@ def vehicles_api():
             conn.close()
     
     # GET request
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM vehicles ORDER BY id')
     rows = cursor.fetchall()
@@ -532,7 +532,7 @@ def vehicles_api():
 @app.route('/api/vehicles/<vehicle_id>', methods=['DELETE'])
 @login_required
 def delete_vehicle(vehicle_id):
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('DELETE FROM vehicles WHERE id = ?', (vehicle_id,))
     conn.commit()
@@ -544,7 +544,7 @@ def delete_vehicle(vehicle_id):
 def requests_api():
     if request.method == 'POST':
         data = request.get_json()
-        conn = sqlite3.connect('vehicle_scheduling.db')
+        conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO requests (user_id, requester_name, start_location, end_location, passengers, request_time, start_time, status)
@@ -556,7 +556,7 @@ def requests_api():
         return jsonify({'success': True, 'message': get_text('success')})
     
     # GET request
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     
     if current_user.role == 'admin':
@@ -587,7 +587,7 @@ def requests_api():
 @app.route('/api/requests/<request_id>', methods=['DELETE'])
 @login_required
 def delete_request(request_id):
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('DELETE FROM requests WHERE id = ?', (request_id,))
     conn.commit()
@@ -600,7 +600,7 @@ def delete_request(request_id):
 @login_required
 def verify_return(vehicle_id):
     """Confirm vehicle return"""
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     
     try:
@@ -636,7 +636,7 @@ def run_schedule():
 @login_required
 def get_schedule_result():
     """Get schedule result"""
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -685,7 +685,7 @@ def get_schedule_result():
 @login_required
 def reset_schedule():
     """Reset schedule"""
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     
     try:
@@ -715,7 +715,7 @@ def get_users():
     if current_user.role != 'admin':
         return jsonify({'success': False, 'message': 'Unauthorized'}), 403
     
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('SELECT id, username, role, language FROM users ORDER BY id')
     rows = cursor.fetchall()
@@ -749,7 +749,7 @@ def update_user_role(user_id):
     if user_id == current_user.id:
         return jsonify({'success': False, 'message': 'Cannot change own role'})
     
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('UPDATE users SET role = ? WHERE id = ?', (new_role, user_id))
     conn.commit()
@@ -768,7 +768,7 @@ def delete_user(user_id):
     if user_id == current_user.id:
         return jsonify({'success': False, 'message': 'Cannot delete yourself'})
     
-    conn = sqlite3.connect('vehicle_scheduling.db')
+    conn = sqlite3.connect(os.environ.get('DB_PATH', '/tmp/vehicle_scheduling.db'))
     cursor = conn.cursor()
     cursor.execute('DELETE FROM users WHERE id = ?', (user_id,))
     conn.commit()

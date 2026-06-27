@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" dir="{% if current_lang == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('schedule') }} - Vehicle Scheduling System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>🚗 Vehicle Scheduling System</h1>
+        <div class="user-info">
+            <span>{{ current_user.username }} ({{ current_user.role }})</span>
+            <div class="language-switcher">
+                <a href="/set-language/en" class="lang-btn {% if current_lang == 'en' %}active{% endif %}">EN</a>
+                <a href="/set-language/zh" class="lang-btn {% if current_lang == 'zh' %}active{% endif %}">中文</a>
+                <a href="/set-language/ar" class="lang-btn {% if current_lang == 'ar' %}active{% endif %}">العربية</a>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">{{ t('logout') }}</a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="main-nav">
+            <a href="/" class="nav-link">📊 {{ t('dashboard') }}</a>
+            <a href="/vehicles" class="nav-link">🚗 {{ t('vehicles') }}</a>
+            <a href="/requests" class="nav-link">📝 {{ t('requests') }}</a>
+            <a href="/schedule" class="nav-link active">📅 {{ t('schedule') }}</a>
+            {% if current_user.role == 'admin' %}
+            <a href="/users" class="nav-link">👥 Users</a>
+            {% endif %}
+        </nav>
+        
+        <div class="section">
+            <h2>{{ t('run_schedule') }}</h2>
+            <div id="schedule-message" class="message" style="display:none;"></div>
+            <div class="action-buttons">
+                <button onclick="runSchedule()" class="btn btn-primary">{{ t('run_schedule') }}</button>
+                <button onclick="resetSchedule()" class="btn btn-warning">{{ t('reset_schedule') }}</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>{{ t('schedule_result') }}</h2>
+            <div id="schedule-result"></div>
+        </div>
+    </div>
+    
+    <script src="/static/script.js"></script>
+    <script>
+        loadScheduleResult();
+        
+        // 自动刷新（每20秒）
+        setInterval(() => {
+            loadScheduleResult();
+        }, 20000);
+    </script>
+</body>
+</html>

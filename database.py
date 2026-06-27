@@ -8,7 +8,20 @@ import sqlite3
 import os
 from datetime import datetime
 
-DB_PATH = 'vehicle_scheduling.db'
+# 数据库路径：优先用环境变量，否则用用户 home 目录
+# PythonAnywhere 上 home 目录是 /home/username/
+# 本地运行时用当前目录
+import os as _os
+if 'DB_PATH' in _os.environ:
+    DB_PATH = _os.environ['DB_PATH']
+else:
+    # PythonAnywhere 总是有 /home/username
+    # 本地开发时回到当前目录
+    home = _os.path.expanduser('~')
+    if home == '/root' or not home or home == '/':
+        DB_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'vehicle_scheduling.db')
+    else:
+        DB_PATH = _os.path.join(home, 'vehicle_scheduling.db')
 
 def get_connection():
     """获取数据库连接"""

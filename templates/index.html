@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" dir="{% if current_lang == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('dashboard') }} - Vehicle Scheduling System</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>🚗 Vehicle Scheduling System</h1>
+        <div class="user-info">
+            <span>{{ current_user.username }} ({{ current_user.role }})</span>
+            <div class="language-switcher">
+                <a href="/set-language/en" class="lang-btn {% if current_lang == 'en' %}active{% endif %}">EN</a>
+                <a href="/set-language/zh" class="lang-btn {% if current_lang == 'zh' %}active{% endif %}">中文</a>
+                <a href="/set-language/ar" class="lang-btn {% if current_lang == 'ar' %}active{% endif %}">العربية</a>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">{{ t('logout') }}</a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="main-nav">
+            <a href="/" class="nav-link active">📊 {{ t('dashboard') }}</a>
+            <a href="/vehicles" class="nav-link">🚗 {{ t('vehicles') }}</a>
+            <a href="/requests" class="nav-link">📝 {{ t('requests') }}</a>
+            <a href="/schedule" class="nav-link">📅 {{ t('schedule') }}</a>
+            {% if current_user.role == 'admin' %}
+            <a href="/users" class="nav-link">👥 Users</a>
+            {% endif %}
+        </nav>
+        
+        <!-- 欢迎横幅 -->
+        <div class="welcome-banner">
+            <h2>{{ t('dashboard') }}</h2>
+            <p>{{ t('welcome_message') }}, {{ current_user.username }}! {{ t('fleet_overview') }}</p>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ t('today_requests') }}</h3>
+                <p class="stat-number" id="today-requests">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ t('completion_rate') }}</h3>
+                <p class="stat-number" id="completion-rate">0%</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ t('vehicle_utilization') }}</h3>
+                <p class="stat-number" id="utilization-rate">0%</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ t('available_vehicles') }}</h3>
+                <p class="stat-number" id="available-vehicles">0</p>
+            </div>
+        </div>
+        
+        <!-- 图表 -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>📊 {{ t('vehicle_type_distribution') }}</h3>
+                <canvas id="vehicle-type-chart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 {{ t('request_status_distribution') }}</h3>
+                <canvas id="request-status-chart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🚗 {{ t('vehicle_status_distribution') }}</h3>
+                <canvas id="vehicle-status-chart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📅 {{ t('daily_request_trend') }}</h3>
+                <canvas id="daily-requests-chart"></canvas>
+            </div>
+        </div>
+        
+        <!-- 快速操作 -->
+        <div class="quick-actions">
+            <h2>⚡ {{ t('quick_actions') }}</h2>
+            <div class="action-buttons">
+                <a href="/requests" class="btn btn-primary">{{ t('submit_request') }}</a>
+                <a href="/schedule" class="btn btn-warning">{{ t('run_schedule') }}</a>
+                <button onclick="refreshDashboard()" class="btn btn-info">{{ t('refresh') }}</button>
+            </div>
+        </div>
+        
+        <!-- 车辆归还时间 -->
+        <div class="return-times">
+            <h2>🚗 {{ t('vehicle_return_times') }}</h2>
+            <div id="dashboard-message" class="message" style="display:none;"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{ t('vehicle_id') }}</th>
+                        <th>{{ t('vehicle_type') }}</th>
+                        <th>{{ t('status') }}</th>
+                        <th>{{ t('expected_return') }}</th>
+                        <th>{{ t('actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody id="return-times-tbody">
+                    <tr>
+                        <td colspan="5" class="empty-text">{{ t('loading') }}...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>
